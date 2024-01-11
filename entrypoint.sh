@@ -118,6 +118,7 @@ push_tags() {
 }
 push_to_target() {
     git checkout -f ${INPUT_BRANCH}
+    git pull origin ${INPUT_BRANCH}
     git reset --hard ${PUSH_PROTECTED_TEMPORARY_BRANCH}
     git push ${PUSH_PROTECTED_FORCE_PUSH}
 }
@@ -242,6 +243,15 @@ case ${INPUT_FAIL_FAST} in
         ;;
 esac
 
+# Define a cleanup function that will be run when the script exits
+cleanup() {
+    # Re-protect target branch for pull request reviews (if desired)
+    protect
+}
+
+# Register the cleanup function to be run when the script exits
+trap cleanup EXIT
+
 # Possibly wait for status checks to complete
 wait_for_checks
 
@@ -253,9 +263,6 @@ echo -e "\nPushing '${PUSH_PROTECTED_TEMPORARY_BRANCH}' -> 'origin/${INPUT_BRANC
 push_to_target
 push_tags
 echo "Pushing '${PUSH_PROTECTED_TEMPORARY_BRANCH}' -> 'origin/${INPUT_BRANCH}' ... DONE!"
-
-# Re-protect target branch for pull request reviews (if desired)
-protect
 
 # Exit successfully (will cleanup)
 exit
