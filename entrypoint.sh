@@ -118,7 +118,7 @@ push_tags() {
 }
 push_to_target() {
     git checkout -f ${INPUT_BRANCH}
-    git pull origin ${INPUT_BRANCH}
+    git pull --merge origin ${INPUT_BRANCH}
     git reset --hard ${PUSH_PROTECTED_TEMPORARY_BRANCH}
     git push ${PUSH_PROTECTED_FORCE_PUSH}
 }
